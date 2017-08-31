@@ -36,6 +36,50 @@ router.post('/person', (req, res, next) => {
         res.send({ ok: false, error: 'ข้อมูลไม่ครบ' });
     }
 });
+router.put('/person', (req, res, next) => {
+    const db = req.db;
+    const name = req.body.name;
+    const lname = req.body.lname;
+    const sex = req.body.sex;
+    const typearea = req.body.typearea;
+    const hospcode = req.body.hospcode;
+    const pid = req.body.pid;
+    if (name && lname && sex && typearea && pid && hospcode) {
+        db('person').update({
+            NAME: name,
+            LNAME: lname,
+            SEX: sex,
+            TYPEAREA: typearea
+        }).where({
+            HOSPCODE: hospcode,
+            PID: pid
+        })
+            .then((result) => {
+            res.send({ ok: true });
+        })
+            .catch(error => {
+            res.send({ error: error.message });
+        });
+    }
+    else {
+        res.send({ ok: false, error: 'ข้อมูลไม่ครบ' });
+    }
+});
+router.delete('/person/:hospcode/:pid', (req, res, next) => {
+    const db = req.db;
+    const hospcode = req.params.hospcode;
+    const pid = req.params.pid;
+    db('person').where({
+        HOSPCODE: hospcode,
+        PID: pid
+    }).del()
+        .then((result) => {
+        res.send({ ok: true });
+    })
+        .catch(error => {
+        res.send({ error: error.message });
+    });
+});
 router.get('/person/search', (req, res, next) => {
     const db = req.db;
     const query = req.query.query;
@@ -43,7 +87,8 @@ router.get('/person/search', (req, res, next) => {
     db('person').where(or => {
         or.orWhere('NAME', 'LIKE', _query)
             .orWhere('LNAME', 'LIKE', _query)
-            .orWhere('HOSPCODE', 'LIKE', _query);
+            .orWhere('HOSPCODE', 'LIKE', _query)
+            .orWhere('PID', 'LIKE', _query);
     })
         .limit(8)
         .then((result) => { res.send(result); })
