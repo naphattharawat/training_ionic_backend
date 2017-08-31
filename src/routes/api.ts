@@ -49,6 +49,8 @@ router.put('/person', (req, res, next) => {
   const typearea = req.body.typearea;
   const hospcode = req.body.hospcode;
   const pid = req.body.pid;
+  const lat = req.body.lat;
+  const lng = req.body.lng;
 
   if (name && lname && sex && typearea && pid && hospcode) {
     db('person'
@@ -56,7 +58,9 @@ router.put('/person', (req, res, next) => {
       NAME: name,
       LNAME: lname,
       SEX: sex,
-      TYPEAREA: typearea
+      TYPEAREA: typearea,
+      LAT:lat,
+      LNG:lng
     }).where({
       HOSPCODE: hospcode,
       PID: pid
